@@ -1,0 +1,7 @@
+.history/
+.vscode/
+__pycache__/
+*.db
+*.log
+*.txt
+test.py
