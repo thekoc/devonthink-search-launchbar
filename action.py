@@ -32,12 +32,7 @@ def main():
             LaunchBar.hide()
             dt.reveal_item(uuid)
         elif LaunchBar.is_alternate_key():
-            LaunchBar.hide()
-            dt.open_item(uuid)
-        elif LaunchBar.is_shift_key():
             browse_group(dt, uuid)
-        elif LaunchBar.is_control_key():
-            subprocess.call(['open', record['path']])
         else:
             if argument.get('returnKeyToBrowseGroup'):
                 browse_group(dt, uuid)
@@ -48,8 +43,10 @@ def main():
         if LaunchBar.is_command_key():
             LaunchBar.hide()
             dt.reveal_item(uuid)
-        elif LaunchBar.is_control_key():
+        elif LaunchBar.is_alternate_key():
             subprocess.call(['open', record['path']])
+        elif LaunchBar.is_shift_key():
+            subprocess.call(['open', os.path.dirname(record['path'])])
         else:
             LaunchBar.hide()
             dt.open_item(uuid)
