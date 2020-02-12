@@ -4,4 +4,39 @@ It lets you search and navigate through DEVONthink effectively. It will learn fr
 
 ## How does it work?
 Just enter the keyword and it will do a live and prefix search then nicely present the results for you.
-![Search Result](screenshot/search-result.png)
+![Search Result](screenshots/search-result.png)
+
+### Modifier keys
+If it is not a group:
+- `⌘ + Enter` to reveal that item in DEVONthink
+- `⇧ + Enter` to reveal that item in Finder
+- `⌥ + Enter` to open that item externally
+
+If it is a group:
+- `⌘ + Enter` to reveal that item in DEVONthink
+- `⌥ + Enter` to navigate through that group in Launchbar
+
+Note that if you are already in "navigation mode", just press enter and you can navigate that group, press `⌥ + Enter` to open that group in DEVONthink.
+
+## More details
+### Frequency score
+Except for the search score given by DEVONthink, the tool will adjust that score based on the frequency you open items.
+
+`final_score = search_score + weight * frequency_score`
+
+
+How do the tool calcuate the `frequency_score`?
+
+Every time you choose a item, it update the frequency score of every item appears using the following formula.
+
+`frequency_score = old_score * a + is_chosen (0 or 1) * (1 - a)`
+
+What's the initial value? If the item is never chosen, its score remains to 0. The first time it is chosen, the score is set to a constant `b`, and will never drop below `b`.
+
+You can adjust all those values in the config file `config.py`.
+
+![Config](screenshots/config.png)
+
+The defualt value:
+
+![Config file content](screenshots/configfile.png)
