@@ -1,6 +1,10 @@
 import sqlite3
 import os
 from launchbar import LaunchBar
+import config
+
+CONSTANT_A = config.a
+CONSTANT_B = config.b
 
 class Frequency:
     def __init__(self):
@@ -19,8 +23,8 @@ class Frequency:
             picked_uuid {str} -- The uuid of the chosen item
             candidate_uuids {list} -- The candidate uuids
         """
-        a = 0.8
-        b = 0.5
+        a = CONSTANT_A
+        b = CONSTANT_B
         cursor = self.connection.cursor()
         cursor.executemany(
             'insert or ignore into frequency (uuid) values (?)',

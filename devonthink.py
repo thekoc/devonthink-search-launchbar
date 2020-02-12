@@ -13,12 +13,14 @@ from launchbar import LaunchBar
 from frequency import Frequency
 from logger import logger
 from cache import Cache
-"""An middle tier that handles the records returned by JXA.
+import config
+
+"""An middle layer that handles the records returned by JXA.
 
 Using record (or r) to represent JXA returned record,
 using item to represent LaunchBar item.
 """
-
+CONSTANT_FREQUENCY_WEIGHT = config.frequency_weight
 
 def get_extension_name(r):
     filename = r['filename']
@@ -160,7 +162,7 @@ class DEVONthink:
     def rescore(self, records):
         for r in records:
             frequency = self.frequency.get_frequency(r['uuid'])
-            r['score'] += 2 * frequency if frequency else 0
+            r['score'] += CONSTANT_FREQUENCY_WEIGHT * frequency if frequency else 0
         records.sort(key=lambda r: r['score'], reverse=True)
 
 
