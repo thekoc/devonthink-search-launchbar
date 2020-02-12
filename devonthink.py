@@ -112,8 +112,8 @@ class DEVONthink:
 
     def reveal_item(self, uuid):
         self.activate()
-        # cmd = ['/usr/bin/open', 'x-devonthink-item://{}?reveal=1'.format(uuid)]
-        cmd = ['/usr/bin/osascript', 'reveal.scpt', uuid]
+        cmd = ['/usr/bin/open', 'x-devonthink-item://{}?reveal=1'.format(uuid)]
+        # cmd = ['/usr/bin/osascript', 'reveal.scpt', uuid]
         subprocess.call(cmd)
 
     def open_item(self, uuid):
