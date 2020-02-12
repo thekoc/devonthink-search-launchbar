@@ -4,3 +4,4 @@ It lets you search and navigate through DEVONthink effectively. It will learn fr
 
 ## How does it work?
 Just enter the keyword and it will do a live and prefix search then nicely present the results for you.
+![Search Result](screenshot/search-result.png)
