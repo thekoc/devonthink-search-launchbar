@@ -7,33 +7,51 @@ class Frequency:
         self.sql_path = os.path.join(LaunchBar.support_path(), 'frequency.db')
         self.connection = sqlite3.connect(self.sql_path)
         cursor = self.connection.cursor()
-        cursor.execute("create table if not exists frequency (uuid text primary key, picked integer default 0, appeared integer default 0)")
+        cursor.execute("create table if not exists frequency (uuid text primary key, score integer default 0)")
         self.connection.commit()
 
-    def update_frequency(self, picked_uuid, candidate_uuids):    
+    def update_frequency(self, picked_uuid, candidate_uuids):
+        """This is not strict frequency but "frequency score"
+
+        The "frequency score" is calculated by `old_value * a + is_chosen * (1-a)` where 0 < a < 1
+        
+        Arguments:
+            picked_uuid {str} -- The uuid of the chosen item
+            candidate_uuids {list} -- The candidate uuids
+        """
+        a = 0.8
+        b = 0.5
         cursor = self.connection.cursor()
         cursor.executemany(
             'insert or ignore into frequency (uuid) values (?)',
             ((uuid,) for uuid in candidate_uuids)
         )
-        cursor.executemany(
-            'update frequency set appeared = appeared + 1 where uuid = ?',
-            ((uuid,) for uuid in candidate_uuids))
+        not_chosen = set(candidate_uuids) - set([picked_uuid])
 
-        cursor.execute(
-            'insert or ignore into frequency (uuid) values (?)', (picked_uuid,)
-        )
-        cursor.execute(
-            'update frequency set picked = picked + 1 where uuid = ?', (picked_uuid,))
+        cursor.executemany(
+            'update frequency set score = score * ? where uuid = ?',
+            ((a, uuid,) for uuid in not_chosen))
+
+        cursor.executemany(
+            'update frequency set score = ? where uuid = ? and 0 < score and score < ?',
+            ((b, uuid, b) for uuid in not_chosen))
+        
+        picked_score = self.get_frequency(picked_uuid)
+        if picked_score == 0:
+            cursor.execute(
+                'update frequency set score = ? where uuid = ?', (b, picked_uuid,))
+        else:
+            cursor.execute(
+                'update frequency set score = score * ? + ? where uuid = ?', (a, 1 - a, picked_uuid,))
         self.connection.commit()
 
     def get_frequency(self, uuid):
         cursor = self.connection.cursor()
-        cursor.execute('select picked, appeared from frequency where uuid = ?', (uuid,))
+        cursor.execute('select score from frequency where uuid = ?', (uuid,))
         one = cursor.fetchone()
         if one:
-            picked, appeared = one
-            return picked / appeared
+            score = one[0]
+            return score
         else:
             return None
 

@@ -160,7 +160,7 @@ class DEVONthink:
     def rescore(self, records):
         for r in records:
             frequency = self.frequency.get_frequency(r['uuid'])
-            r['score'] += 1.5 * frequency if frequency else 0
+            r['score'] += 2 * frequency if frequency else 0
         records.sort(key=lambda r: r['score'], reverse=True)
 
 
@@ -170,7 +170,6 @@ class DEVONthink:
         logger.debug('after search js')
         logger.debug('before rescore')
         self.rescore(records)
-        # print([i['score'] for i in records])
         logger.debug('after rescore')
         candidate_uuids = [r['uuid'] for r in records]
         return [to_lb_item(r, candidate_uuids, returnKeyToBrowseGroup=False) for r in records]
