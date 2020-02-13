@@ -11,7 +11,7 @@ from devonthink import DEVONthink
 from logger import logger
 import config
 
-QUERY_TEMPLATE = config.query_template
+QUERY_TEMPLATE = 'name:{} tags!=exclude-from-launchbar'
 items = []
 
 def preprocess_query(arg):
