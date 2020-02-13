@@ -9,7 +9,9 @@ import re
 
 from devonthink import DEVONthink
 from logger import logger
+import config
 
+QUERY_TEMPLATE = config.query_template
 items = []
 
 def preprocess_query(arg):
@@ -19,7 +21,7 @@ def preprocess_query(arg):
         else:
             return '~' + word
     
-    query_template = 'name:{} tags!=exclude-from-launchbar'
+    query_template = QUERY_TEMPLATE
     if len(arg.split()) == 1:
         return query_template.format(prepend_tilde(arg))
     else:
