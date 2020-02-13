@@ -18,6 +18,9 @@ If it is a group:
 
 Note that if you are already in "navigation mode", just press enter and you can navigate that group, press `⌥ + Enter` to open that group in DEVONthink.
 
+### Excluded tag
+If you tag a file/group `exclude-from-launchbar`, it will not be shown in the result.
+
 ## More details
 ### Frequency score
 Except for the search score given by DEVONthink, the tool will adjust that score based on the frequency you open items.
@@ -33,10 +36,25 @@ Every time you choose a item, it update the frequency score of every item appear
 
 What's the initial value? If the item is never chosen, its score remains to 0. The first time it is chosen, the score is set to a constant `b`, and will never drop below `b`.
 
+
+### Query template
+The default query template is
+
+`'name:{} tags!=exclude-from-launchbar'`
+
+
+
+### Config file
 You can adjust all those values in the config file `config.py`.
 
 ![Config](screenshots/config.png)
 
-The defualt value:
+Defualt values:
 
 ![Config file content](screenshots/configfile.png)
+```python
+a = 0.8
+b = 0.5
+frequency_weight = 2
+query_template = 'name:{} tags!=exclude-from-launchbar'
+```
