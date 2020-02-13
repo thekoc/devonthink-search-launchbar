@@ -11,7 +11,9 @@ from devonthink import DEVONthink
 from logger import logger
 import config
 
-QUERY_TEMPLATE = 'name:({}) tags!=exclude-from-launchbar'
+
+EXCLUDED_TAG = config.excluded_tag
+QUERY_TEMPLATE = 'name:({}) tags!={}'
 items = []
 
 def preprocess_query(arg):
@@ -20,14 +22,13 @@ def preprocess_query(arg):
             return word
         else:
             return '~' + word
-    
-    query_template = QUERY_TEMPLATE
+
     if len(arg.split()) == 1:
-        return query_template.format(prepend_tilde(arg))
+        return QUERY_TEMPLATE.format(prepend_tilde(arg), EXCLUDED_TAG)
     else:
         parts = arg.split(' ')
         parts = [prepend_tilde(p) for p in parts]
-        return query_template.format(' '.join(parts))
+        return QUERY_TEMPLATE.format(' '.join(parts), EXCLUDED_TAG)
 
 def main():
     dt = DEVONthink()
