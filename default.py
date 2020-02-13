@@ -11,7 +11,7 @@ from devonthink import DEVONthink
 from logger import logger
 import config
 
-QUERY_TEMPLATE = 'name:{} tags!=exclude-from-launchbar'
+QUERY_TEMPLATE = 'name:({}) tags!=exclude-from-launchbar'
 items = []
 
 def preprocess_query(arg):
@@ -26,7 +26,7 @@ def preprocess_query(arg):
         return query_template.format(prepend_tilde(arg))
     else:
         parts = arg.split(' ')
-        parts[-1] = prepend_tilde(parts[-1])
+        parts = [prepend_tilde(p) for p in parts]
         return query_template.format(' '.join(parts))
 
 def main():
