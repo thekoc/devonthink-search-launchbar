@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sqlite3
 import os
 from launchbar import LaunchBar
