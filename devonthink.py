@@ -87,6 +87,7 @@ def to_lb_item(record, candidate_uuids, returnKeyToBrowseGroup=True):
             'badge': record['kind'],
             'icon': potential_icon,
             'quickLookURL': 'file://' + quote(record['path']),
+            'path': record['path'],
             'subtitle': '📂' + readable_path(record.get('location')),
             'alwaysShowsSubtitle': True,
             'action': 'action.py',
