@@ -40,7 +40,9 @@ def main():
                 LaunchBar.hide()
                 dt.open_item(uuid)
     else:
-        if LaunchBar.is_command_key():
+        if LaunchBar.is_command_key() and LaunchBar.is_alternate_key():
+            subprocess.call(['open', os.path.dirname(record['path'])])
+        elif LaunchBar.is_command_key():
             LaunchBar.hide()
             dt.reveal_item(uuid)
         elif LaunchBar.is_alternate_key():
