@@ -10,6 +10,9 @@ from launchbar import LaunchBar
 
 DB_PATH = os.path.join(LaunchBar.support_path(), 'cache.db')
 
+def _get_or_fetch_map(x):
+    return Cache().get_or_fetch(x[0], x[1])
+
 class Cache:
     def __init__(self):
         self.connection = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
@@ -58,8 +61,8 @@ class Cache:
         else:
             return None
     
-    def get_or_fetch(self, uuid, cache=True):
-        return self.get_or_fetch_multiple((uuid,), cache)[0]
+    def get_or_fetch(self, uuid, modification_date, cache=True):
+        return self.get_or_fetch_multiple((uuid,), (modification_date,), cache)[0]
 
     def get_or_fetch_multiple(self, uuids, modification_dates=None, cache=True, include_modification=False):
         records = [None] * len(uuids)
@@ -89,10 +92,11 @@ class Cache:
 
         return records
 
-    def get_or_fetch_multithread(self, uuids):
-        # from multiprocessing import Pool
-        pool = ThreadPool(64)
-        results = pool.map(lambda u: Cache().get_or_fetch(u), uuids)
+    def get_or_fetch_multithread(self, uuids, modification_dates):
+        from multiprocessing import Pool
+        pool = Pool(8)
+
+        results = pool.map(_get_or_fetch_map, zip(uuids, modification_dates))
         pool.close() 
         pool.join()
         return results
