@@ -17,10 +17,10 @@ class Cache:
     def __init__(self):
         self.connection = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
     
-    def cache(self, record, commit=True):
-        return self.cache_many((record,), commit)
+    def cache_record(self, record, commit=True):
+        return self.cache_records((record,), commit)
     
-    def cache_many(self, records, commit=True):
+    def cache_records(self, records, commit=True):
         fields = ('uuid', 'name', 'filename', 'path', 'location', 'type', 'kind', 'thumbnail')
         new_records = []
         for r in records:
@@ -43,7 +43,43 @@ class Cache:
         if commit:
             self.connection.commit()
     
-    def get_cached(self, uuid, modification_date=None):
+    def cache_query(self, query, uuids, commit=True):
+        cursor = self.connection.cursor()
+        query_date = datetime.now()
+        for uuid in uuids:
+            cursor.execute(
+                """insert or ignore into query (
+                    query, record_uuid, query_date
+                ) values (:query, :record_uuid, :query_date""", {
+                    'query': query,
+                    'record_uuid':  uuid,
+                    'query_date': query_date
+                }
+            )
+            cursor.execute(
+                """update query
+                set record_uuid = :record_uuid, query_date = :query_date
+                where query = :query, record_uuid = :record_uuid""", {
+                    'query': query,
+                    'record_uuid':  uuid,
+                    'query_date': query_date,
+                }
+            )
+        if commit:
+            self.connection.commit()
+    
+    def get_cached_query(self, query):
+        cursor = self.connection.cursor()
+        cursor.execute('select record_uuid, query_date from query where query = :query', {'query': query})
+        rows = cursor.fetchall()
+        uuids = []
+        query_date = None
+        for row in rows:
+            uuids.append(row[0])
+            query_date = row[1]
+        return uuids, query_date
+    
+    def get_cached_record(self, uuid, modification_date=None):
         cursor = self.connection.cursor()
         if modification_date:
             cursor.execute('select uuid, name, filename, path, location, type, kind, thumbnail, modification from record where uuid = :uuid and modification > :modification_date',
@@ -71,7 +107,7 @@ class Cache:
             assert all(isinstance(d, datetime) for d in modification_dates)
         for i, uuid in enumerate(uuids):
             modification_date = modification_dates[i]
-            cached = self.get_cached(uuid, modification_date=modification_date)
+            cached = self.get_cached_record(uuid, modification_date=modification_date)
             if cached:
                 records[uuid_to_pos[uuid]] = cached
                 hits.add(uuid)
@@ -80,7 +116,7 @@ class Cache:
         if remained:
             remianed_records = self.fetch(remained)
             if cache:
-                self.cache_many(remianed_records)
+                self.cache_records(remianed_records)
             for r in remianed_records:
                 records[uuid_to_pos[r['uuid']]] = r
 
@@ -124,4 +160,4 @@ cursor.execute("""create table if not exists record (
 Cache().connection.commit()
 
 if __name__ == "__main__":
-    print(Cache().get_cached('35C2D49D-8A59-4E43-8A91-7C547E52A4FF', modification_date=datetime(1997, 2, 19)))
+    print(Cache().get_cached_record('35C2D49D-8A59-4E43-8A91-7C547E52A4FF', modification_date=datetime(1997, 2, 19)))
