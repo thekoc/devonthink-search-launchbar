@@ -63,7 +63,7 @@ def get_icon(r):
         return os.path.join(LaunchBar.resources_path(), 'unknown.icns')
 
 def to_lb_item(record, candidate_uuids, returnKeyToBrowseGroup=True):
-    keys = ['name', 'kind', 'location', 'type', 'path', 'uuid', 'filename', 'referenceURL']
+    keys = ['name', 'kind', 'location', 'type', 'path', 'uuid', 'filename']
     record = {key: record.get(key) for key in keys}
     potential_icon = get_icon(record)
     actionArgument = json.dumps({

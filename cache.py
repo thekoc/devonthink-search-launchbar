@@ -21,23 +21,23 @@ class Cache:
         return self.cache_many((record,), commit)
     
     def cache_many(self, records, commit=True):
-        fields = ('uuid', 'name', 'filename', 'path', 'location', 'referenceURL', 'type', 'kind', 'thumbnail')
+        fields = ('uuid', 'name', 'filename', 'path', 'location', 'type', 'kind', 'thumbnail')
         new_records = []
         for r in records:
             new_record = {}
             for f in fields:
                 new_record[f] = r.get(f)
-            new_record['modification'] = datetime.now()
+            new_record['modification'] = datetime.now() # It's actually  more like "touch date"
             new_records.append(new_record)
         cursor = self.connection.cursor()
         cursor.executemany(
             """insert or ignore into record (
-                uuid, name, filename, path, location, reference_url, type, kind, thumbnail, modification
-            ) values (:uuid, :name, :filename, :path, :location, :referenceURL, :type, :kind, :thumbnail, :modification)""", new_records
+                uuid, name, filename, path, location, type, kind, thumbnail, modification
+            ) values (:uuid, :name, :filename, :path, :location, :type, :kind, :thumbnail, :modification)""", new_records
         )
         cursor.executemany(
             """update record
-            set name = :name, filename = :filename, path = :path, location = :location, reference_url = :referenceURL, type = :type, kind = :kind, thumbnail = :thumbnail, modification = :modification
+            set name = :name, filename = :filename, path = :path, location = :location, type = :type, kind = :kind, thumbnail = :thumbnail, modification = :modification
             where uuid = :uuid""", new_records
         )
         if commit:
@@ -46,13 +46,13 @@ class Cache:
     def get_cached(self, uuid, modification_date=None):
         cursor = self.connection.cursor()
         if modification_date:
-            cursor.execute('select uuid, name, filename, path, location, reference_url, type, kind, thumbnail, modification from record where uuid = :uuid and modification > :modification_date',
+            cursor.execute('select uuid, name, filename, path, location, type, kind, thumbnail, modification from record where uuid = :uuid and modification > :modification_date',
                 {'uuid': uuid, 'modification_date': modification_date})
         else:
-            cursor.execute('select uuid, name, filename, path, location, reference_url, type, kind, thumbnail, modification from record where uuid = :uuid', {'uuid': uuid})
+            cursor.execute('select uuid, name, filename, path, location, type, kind, thumbnail, modification from record where uuid = :uuid', {'uuid': uuid})
         row = cursor.fetchone()
         if row:
-            keys = ('uuid', 'name', 'filename', 'path', 'location', 'referenceURL', 'type', 'kind', 'thumbnail', 'modification')
+            keys = ('uuid', 'name', 'filename', 'path', 'location', 'type', 'kind', 'thumbnail', 'modification')
             return dict(zip(keys, row))
         else:
             return None
@@ -115,7 +115,6 @@ cursor.execute("""create table if not exists record (
     filename text,
     path text,
     location text,
-    reference_url text,
     type text,
     kind text,
     thumbnail text,
