@@ -59,10 +59,12 @@ def get_icon(r):
     if os.path.isfile(potential_icon):
         return potential_icon
     else:
-        logger.debug('document without icon: {}'.format(get_type(r)))
+        # logger.debug('document without icon: {}'.format(get_type(r)))
         return os.path.join(LaunchBar.resources_path(), 'unknown.icns')
 
 def to_lb_item(record, candidate_uuids, returnKeyToBrowseGroup=True):
+    keys = ['name', 'kind', 'location', 'type', 'path', 'uuid', 'filename', 'referenceURL']
+    record = {key: record.get(key) for key in keys}
     potential_icon = get_icon(record)
     actionArgument = json.dumps({
         'pickedRecord': record,

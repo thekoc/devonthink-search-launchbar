@@ -43,7 +43,7 @@ class Cache:
         if commit:
             self.connection.commit()
     
-    def get_cached(self, uuid, include_modification=False, modification_date=None):
+    def get_cached(self, uuid, modification_date=None):
         cursor = self.connection.cursor()
         if modification_date:
             cursor.execute('select uuid, name, filename, path, location, reference_url, type, kind, thumbnail, modification from record where uuid = :uuid and modification > :modification_date',
@@ -52,11 +52,7 @@ class Cache:
             cursor.execute('select uuid, name, filename, path, location, reference_url, type, kind, thumbnail, modification from record where uuid = :uuid', {'uuid': uuid})
         row = cursor.fetchone()
         if row:
-            if include_modification:
-                keys = ('uuid', 'name', 'filename', 'path', 'location', 'referenceURL', 'type', 'kind', 'thumbnail', 'modification')
-            else:
-                row = row[:-1]
-                keys = ('uuid', 'name', 'filename', 'path', 'location', 'referenceURL', 'type', 'kind', 'thumbnail')
+            keys = ('uuid', 'name', 'filename', 'path', 'location', 'referenceURL', 'type', 'kind', 'thumbnail', 'modification')
             return dict(zip(keys, row))
         else:
             return None
@@ -64,7 +60,7 @@ class Cache:
     def get_or_fetch(self, uuid, modification_date, cache=True):
         return self.get_or_fetch_multiple((uuid,), (modification_date,), cache)[0]
 
-    def get_or_fetch_multiple(self, uuids, modification_dates=None, cache=True, include_modification=False):
+    def get_or_fetch_multiple(self, uuids, modification_dates=None, cache=True):
         records = [None] * len(uuids)
         uuid_to_pos = {uuid: i for i, uuid in enumerate(uuids)}
         uuids = set(uuids)
@@ -75,22 +71,25 @@ class Cache:
             assert all(isinstance(d, datetime) for d in modification_dates)
         for i, uuid in enumerate(uuids):
             modification_date = modification_dates[i]
-            cached = self.get_cached(uuid, include_modification=include_modification, modification_date=modification_date)
+            cached = self.get_cached(uuid, modification_date=modification_date)
             if cached:
                 records[uuid_to_pos[uuid]] = cached
                 hits.add(uuid)
         remained = uuids.difference(hits)
         
         if remained:
-            import subprocess
-            import json
-            remianed_records = json.loads(subprocess.check_output(['osascript', '-l', 'JavaScript', 'uuid.js'] + list(remained)))
+            remianed_records = self.fetch(remained)
             if cache:
                 self.cache_many(remianed_records)
             for r in remianed_records:
                 records[uuid_to_pos[r['uuid']]] = r
 
         return records
+    
+    def fetch(self, uuids):
+        import subprocess
+        import json
+        return json.loads(subprocess.check_output(['osascript', '-l', 'JavaScript', 'uuid.js'] + list(uuids)))
 
     def get_or_fetch_multithread(self, uuids, modification_dates):
         from multiprocessing import Pool
@@ -102,6 +101,14 @@ class Cache:
         return results
 
 cursor = Cache().connection.cursor()
+
+cursor.execute("""create table if not exists query (
+    query text,
+    record_uuid,
+    query_date timestamp,
+    PRIMARY KEY (query, record_uuid)
+)""")
+
 cursor.execute("""create table if not exists record (
     uuid text primary key,
     name text,
@@ -114,6 +121,7 @@ cursor.execute("""create table if not exists record (
     thumbnail text,
     modification timestamp
 )""")
+
 Cache().connection.commit()
 
 if __name__ == "__main__":
