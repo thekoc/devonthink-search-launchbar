@@ -178,13 +178,6 @@ class DEVONthink:
             c['score'] = r['score']
         return cached
 
-    
-    def exists_deleted_records(self, query, query_date, uuids):
-        date_str = query_date.strftime('%Y-%m-%d %H:%M:%S')
-        query = 'additionDate<={query_date} {query}'.format(query=query, query_date=date_str)
-        records_num = len(search_js(query, None))
-        # It might be wrong if some records were excluded from search then recovered
-        return records_num != len(uuids)
 
     def search_js_cached(self, query):
         def str_to_date(date_str):
@@ -210,38 +203,39 @@ class DEVONthink:
 
         cached_uuids, cached_scores, query_date = self.cache.get_cached_query(query)
 
-        date_str = query_date.strftime('%Y-%m-%d %H:%M:%S')
-        query_until_cached = 'additionDate<={date_s} {query}'.format(query=query, date_s=date_str)
-        query_after_cached = 'additionDate>={date_s} OR modificationDate>={date_s} {query}'.format(query=query, date_s=date_str)
-        records_until, records_after = search_js_many([(query_until_cached, None), (query_after_cached, 'part')])
-
-        cached_stale = len(records_until) != len(cached_uuids)
-            
-
-        if not cached_uuids or cached_stale:
+        if not query_date:
             return live_search_with_cached_records(query)
         else:
-            # only search for new items
-            new_records = records_after
-            all_uuids = [i for i in cached_uuids]
-            all_scores = [i for i in cached_scores]
-            all_modification = [None for i in cached_uuids]
+            date_str = query_date.strftime('%Y-%m-%d %H:%M:%S')
+            query_until_cached = 'additionDate<={date_s} {query}'.format(query=query, date_s=date_str)
+            query_after_cached = 'additionDate>={date_s} OR modificationDate>={date_s} {query}'.format(query=query, date_s=date_str)
+            records_until, records_after = search_js_many([(query_until_cached, None), (query_after_cached, 'part')])
 
-            for record in new_records:
-                if record['uuid'] in all_uuids:
-                    index = all_uuids.index(record['uuid'])
-                    all_scores[index] = record['score']
-                    all_modification[index] = str_to_date(record['modificationDate'])
-                else:
-                    all_uuids.append(record['uuid'])
-                    all_scores.append(record['score'])
-                    all_modification.append(str_to_date(record['modificationDate']))
+            cached_stale = len(records_until) != len(cached_uuids)
+            if cached_stale:
+                return live_search_with_cached_records(query)
+            else:
+                # only search for new items
+                new_records = records_after
+                all_uuids = [i for i in cached_uuids]
+                all_scores = [i for i in cached_scores]
+                all_modification = [None for i in cached_uuids]
 
-            self.cache.cache_query(query, all_uuids, all_scores)
-            all_records = self.cache.get_or_fetch_multiple(all_uuids, modification_dates=all_modification)
-            for r, s in zip(all_records, all_scores):
-                r['score'] = s
-            return all_records
+                for record in new_records:
+                    if record['uuid'] in all_uuids:
+                        index = all_uuids.index(record['uuid'])
+                        all_scores[index] = record['score']
+                        all_modification[index] = str_to_date(record['modificationDate'])
+                    else:
+                        all_uuids.append(record['uuid'])
+                        all_scores.append(record['score'])
+                        all_modification.append(str_to_date(record['modificationDate']))
+
+                self.cache.cache_query(query, all_uuids, all_scores)
+                all_records = self.cache.get_or_fetch_multiple(all_uuids, modification_dates=all_modification)
+                for r, s in zip(all_records, all_scores):
+                    r['score'] = s
+                return all_records
 
     def search_js_multithread(self, query):
         pass

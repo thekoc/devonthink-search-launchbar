@@ -11,10 +11,26 @@ function search(dtp, query, dbUuids) {
     return records;
 }
 
-function run(argv) {
-    let dtp = Application("DEVONthink 3");
+function test() {
+    searchOnce({query: 'additionDate<=2020-02-23 17:32:36 name:(~com) tags!=exclude-from-launchbar', field: undefined})
+    searchOnce({query: 'additionDate>=2020-02-23 17:32:36 OR modificationDate>=2020-02-23 17:32:36 name:(~com) tags!=exclude-from-launchbar', field: 'part'})
+}
 
-    let jsonArg = JSON.parse(argv[0])
+function run(argv) {
+    let jsonArgv = JSON.parse(argv[0]);
+    if (Array.isArray(jsonArgv)) {
+        let results = [];
+        for (let arg of jsonArgv) {
+            results.push(searchOnce(arg));
+        }
+        return JSON.stringify(results);
+    } else {
+        return JSON.stringify(searchOnce(jsonArgv));
+    }
+}
+
+function searchOnce(jsonArg) {
+    let dtp = Application("DEVONthink 3");
     let field = jsonArg.field;
     let scope = jsonArg.scope;
     let dbUuids = [];
@@ -29,8 +45,7 @@ function run(argv) {
     let range = jsonArg.range;
 
     let toJson;
-    if (field == 'all') {
-
+    if (field === 'all') {
         toJson = (r) => {
             let uuid = r.uuid();
             return {
@@ -46,13 +61,17 @@ function run(argv) {
                 kind: r.kind()
             }
         }
-    } else {
+    } else if (field === 'part') {
         toJson = (r) => {
             return {
                 score: r.score(),
                 uuid: r.uuid(),
                 modificationDate: r.modificationDate()
             }
+        }
+    } else {
+        toJson = (r) => {
+            return {};
         }
     }
 
@@ -68,5 +87,5 @@ function run(argv) {
     //     return (a.score > b.score) ? -1 : (a.score < b.score) ? 1 : 0;
     // });
 
-    return JSON.stringify(results);
+    return results;
 }
