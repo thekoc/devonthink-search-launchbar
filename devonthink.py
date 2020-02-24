@@ -103,6 +103,18 @@ def get_group_children(uuid):
     output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'group.js', uuid])
     return json.loads(output)
 
+
+def search_js(query, field):
+    jsonArg = json.dumps({
+        'query': query,
+        'field': field,
+        # 'range': [0, 80]
+    })
+    logger.debug('start search js query: {}'.format(query))
+    output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'search.js', jsonArg])
+    logger.debug('end search js query: {}'.format(query))
+    return json.loads(output)
+
 class DEVONthink:
     """Provide scored result in LaunchBar items json list."""
     cache = Cache()
@@ -133,8 +145,9 @@ class DEVONthink:
         })
         output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'search.js', jsonArg])
         return json.loads(output)
-    
-    def search_js_cached(self, query):
+
+        
+    def search_js_cached_old(self, query):
         logger.debug('before jxa search.js')
         jsonArg = json.dumps({
             'query': query,
@@ -158,7 +171,65 @@ class DEVONthink:
         for c, r in zip(cached, records):
             c['score'] = r['score']
         return cached
+
     
+    def exists_deleted_records(self, query, query_date, uuids):
+        date_str = query_date.strftime('%Y-%m-%d %H:%M:%S')
+        query = 'additionDate<={query_date} {query}'.format(query=query, query_date=date_str)
+        records_num = len(search_js(query, None))
+        # It might be wrong if some records were excluded from search then recovered
+        return records_num != len(uuids)
+
+    def search_js_cached(self, query):
+        def str_to_date(date_str):
+            return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f%z")
+
+        def live_search_with_cached_records(query):
+            records  = search_js(query, 'part')
+            logger.debug('after jxa search.js')
+
+            uuids = [r['uuid'] for r in records]
+            scores = [r['score'] for r in records]
+            self.cache.cache_query(query, uuids, scores)
+
+            logger.debug('before get_or_fetch_multiple')
+            modification_dates = [str_to_date(r['modificationDate']) for r in records]
+
+            cached = self.cache.get_or_fetch_multiple(uuids, modification_dates=modification_dates)
+            logger.debug('after get_or_fetch_multiple')
+            for c, r in zip(cached, records):
+                c['score'] = r['score']
+            return cached
+
+
+        cached_uuids, cached_scores, query_date = self.cache.get_cached_query(query)
+        if not cached_uuids or self.exists_deleted_records(query, query_date, cached_uuids):
+            return live_search_with_cached_records(query)
+        else:
+            # only search for new items
+            date_s = query_date.strftime('%Y-%m-%d %H:%M:%S')
+            query = 'additionDate>={date_s} OR modificationDate>={date_s} {query}'.format(query=query, date_s=date_s)
+            new_records = search_js(query, 'part')
+            all_uuids = [i for i in cached_uuids]
+            all_scores = [i for i in cached_scores]
+            all_modification = [None for i in cached_uuids]
+
+            for record in new_records:
+                if record['uuid'] in all_uuids:
+                    index = all_uuids.index(record['uuid'])
+                    all_scores[index] = record['score']
+                    all_modification[index] = str_to_date(record['modificationDate'])
+                else:
+                    all_uuids.append(record['uuid'])
+                    all_scores.append(record['score'])
+                    all_modification.append(str_to_date(record['modificationDate']))
+
+            self.cache.cache_query(query, all_uuids, all_scores)
+            all_records = self.cache.get_or_fetch_multiple(all_uuids, modification_dates=all_modification)
+            for r, s in zip(all_records, all_scores):
+                r['score'] = s
+            return all_records
+
     def search_js_multithread(self, query):
         pass
     
@@ -174,8 +245,10 @@ class DEVONthink:
         records = self.search_js_cached(query)
         logger.debug('after search js')
         logger.debug('before rescore')
+        logger.debug([r['score'] for r in records])
         self.rescore(records)
         logger.debug('after rescore')
+        logger.debug([r['score'] for r in records])
         candidate_uuids = [r['uuid'] for r in records]
         return [to_lb_item(r, candidate_uuids, returnKeyToBrowseGroup=False) for r in records]
     

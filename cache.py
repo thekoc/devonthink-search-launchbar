@@ -43,25 +43,27 @@ class Cache:
         if commit:
             self.connection.commit()
     
-    def cache_query(self, query, uuids, commit=True):
+    def cache_query(self, query, uuids, scores, commit=True):
         cursor = self.connection.cursor()
         query_date = datetime.now()
-        for uuid in uuids:
+        for uuid, score in zip(uuids, scores):
             cursor.execute(
                 """insert or ignore into query (
-                    query, record_uuid, query_date
-                ) values (:query, :record_uuid, :query_date""", {
+                    query, record_uuid, score, query_date
+                ) values (:query, :record_uuid, :score, :query_date)""", {
                     'query': query,
                     'record_uuid':  uuid,
+                    'score':score,
                     'query_date': query_date
                 }
             )
             cursor.execute(
                 """update query
-                set record_uuid = :record_uuid, query_date = :query_date
-                where query = :query, record_uuid = :record_uuid""", {
+                set record_uuid = :record_uuid, score = :score, query_date = :query_date
+                where query = :query AND record_uuid = :record_uuid""", {
                     'query': query,
                     'record_uuid':  uuid,
+                    'score': score,
                     'query_date': query_date,
                 }
             )
@@ -70,14 +72,16 @@ class Cache:
     
     def get_cached_query(self, query):
         cursor = self.connection.cursor()
-        cursor.execute('select record_uuid, query_date from query where query = :query', {'query': query})
+        cursor.execute('select record_uuid, score, query_date from query where query = :query', {'query': query})
         rows = cursor.fetchall()
         uuids = []
+        scores = []
         query_date = None
         for row in rows:
             uuids.append(row[0])
-            query_date = row[1]
-        return uuids, query_date
+            scores.append(row[1])
+            query_date = row[2]
+        return uuids, scores, query_date
     
     def get_cached_record(self, uuid, modification_date=None):
         cursor = self.connection.cursor()
@@ -104,7 +108,7 @@ class Cache:
 
         if modification_dates:
             assert len(uuids) == len(modification_dates)
-            assert all(isinstance(d, datetime) for d in modification_dates)
+            assert all(isinstance(d, datetime) or d is None for d in modification_dates)
         for i, uuid in enumerate(uuids):
             modification_date = modification_dates[i]
             cached = self.get_cached_record(uuid, modification_date=modification_date)
@@ -141,6 +145,7 @@ cursor = Cache().connection.cursor()
 cursor.execute("""create table if not exists query (
     query text,
     record_uuid,
+    score real,
     query_date timestamp,
     PRIMARY KEY (query, record_uuid)
 )""")
