@@ -101,30 +101,27 @@ class Cache:
         return self.get_or_fetch_multiple((uuid,), (modification_date,), cache)[0]
 
     def get_or_fetch_multiple(self, uuids, modification_dates=None, cache=True):
-        records = [None] * len(uuids)
-        uuid_to_pos = {uuid: i for i, uuid in enumerate(uuids)}
-        uuids = set(uuids)
+        uuid_to_record = {uuid: None for uuid in uuids}
         hits = set()
 
         if modification_dates:
             assert len(uuids) == len(modification_dates)
             assert all(isinstance(d, datetime) or d is None for d in modification_dates)
-        for i, uuid in enumerate(uuids):
-            modification_date = modification_dates[i]
-            cached = self.get_cached_record(uuid, modification_date=modification_date)
-            if cached:
-                records[uuid_to_pos[uuid]] = cached
+        for uuid, modification in zip(uuids, modification_dates):
+            cached_record = self.get_cached_record(uuid, modification_date=modification)
+            if cached_record:
+                uuid_to_record[uuid] = cached_record
                 hits.add(uuid)
-        remained = uuids.difference(hits)
+        remained = set(uuids).difference(hits)
         
         if remained:
             remianed_records = self.fetch(remained)
             if cache:
                 self.cache_records(remianed_records)
             for r in remianed_records:
-                records[uuid_to_pos[r['uuid']]] = r
+                uuid_to_record[r['uuid']] = r
 
-        return records
+        return [uuid_to_record[uuid] for uuid in uuids]
     
     def fetch(self, uuids):
         import subprocess
