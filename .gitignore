@@ -4,4 +4,4 @@ __pycache__/
 *.db
 *.log
 *.txt
-test.py
+test.*
