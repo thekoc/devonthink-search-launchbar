@@ -21,6 +21,7 @@ Using record (or r) to represent JXA returned record,
 using item to represent LaunchBar item.
 """
 CONSTANT_FREQUENCY_WEIGHT = config.frequency_weight
+MAX_RESULT_NUM = config.max_result_num
 
 def get_extension_name(r):
     filename = r['filename']
@@ -123,10 +124,9 @@ class DEVONthink:
 
     def search_js(self, query):
         logger.debug('before jxa search.js')
-        output = self._call_jsx_search(query, 'part')
+        records = self._call_jsx_search(query, 'part')
         logger.debug('after jxa search.js')
 
-        records = json.loads(output)
         uuids = [r['uuid'] for r in records]
 
         logger.debug('before get_or_fetch_multiple')
@@ -174,7 +174,7 @@ class DEVONthink:
         jsonArg = json.dumps({
             'query': query,
             'field': field,
-            # 'range': [0, 80]
+            'range': [0, MAX_RESULT_NUM]
         })
         logger.debug('start search js query: {}'.format(query))
         output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'search.js', jsonArg])

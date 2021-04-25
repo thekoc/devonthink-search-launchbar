@@ -5,9 +5,14 @@ function getDb(dtp, uuid) {
 
 function search(dtp, query, dbUuids) {
     let records = [];
-    for (let uuid of dbUuids) {
-        records = records.concat(dtp.search(query, {in: dtp.getRecordWithUuid(uuid)}));
+    if (dbUuids === null || dbUuids === undefined) {
+        records = records.concat(dtp.search(query));
+    } else {
+        for (let uuid of dbUuids) {
+            records = records.concat(dtp.search(query, {in: dtp.getRecordWithUuid(uuid)}));
+        }
     }
+
     return records;
 }
 
@@ -32,15 +37,7 @@ function run(argv) {
 function searchOnce(jsonArg) {
     let dtp = Application("DEVONthink 3");
     let field = jsonArg.field;
-    let scope = jsonArg.scope;
-    let dbUuids = [];
-    if (scope) {
-        dbUuids = scope;
-    } else {
-        for (let d of dtp.databases()) {
-            dbUuids.push(d.uuid());
-        }
-    }
+    let dbUuids = jsonArg.dbUuids;
     let query = jsonArg.query;
     let range = jsonArg.range;
 
