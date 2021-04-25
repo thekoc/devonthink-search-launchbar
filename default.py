@@ -5,7 +5,6 @@
 
 import sys
 import json
-import re
 
 from devonthink import DEVONthink
 from logger import logger
@@ -51,16 +50,9 @@ def main():
             'title': 'Please input the query',
             'icon': 'character:⌨️'
             })
+    logger.debug(f'Record amounts: {len(items)}')
     print(json.dumps(items))
 
-    # print(items[0])
-    # import subprocess
-    # subprocess.call(['./action.py', items[0]['actionArgument']])
 
 if __name__ == "__main__":
     main()
-    # items.append({
-    #     'title': 'test',
-    #     'action': 'action.py',
-    # })
-    # print(json.dumps(items))

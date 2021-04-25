@@ -99,10 +99,6 @@ def to_lb_item(record, candidate_uuids, returnKeyToBrowseGroup=True):
     return item
 
 
-def get_group_children(uuid):
-    output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'group.js', uuid])
-    return json.loads(output)
-
 class DEVONthink:
     """Provide scored result in LaunchBar items json list."""
     cache = Cache()
@@ -127,7 +123,7 @@ class DEVONthink:
 
     def search_js(self, query):
         logger.debug('before jxa search.js')
-        output = self._call_jsx(query, 'part')
+        output = self._call_jsx_search(query, 'part')
         logger.debug('after jxa search.js')
 
         records = json.loads(output)
@@ -165,12 +161,16 @@ class DEVONthink:
         return [to_lb_item(r, candidate_uuids, returnKeyToBrowseGroup=False) for r in records]
     
     def group(self, group_uuid):
-        children = get_group_children(group_uuid)
+        children = self._call_jsx_get_group_children(group_uuid)
         self.rescore(children)
         candidate_uuids = [r['uuid'] for r in children] 
         return [to_lb_item(r, candidate_uuids) for r in children]
 
-    def _call_jsx(self, query, field):
+    def _call_jsx_get_group_children(self, uuid):
+        output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'group.js', uuid])
+        return json.loads(output)
+
+    def _call_jsx_search(self, query, field):
         jsonArg = json.dumps({
             'query': query,
             'field': field,
