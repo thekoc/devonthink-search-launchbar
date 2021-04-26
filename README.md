@@ -40,15 +40,17 @@ It can be downloaded [here](https://github.com/thekoc/devonthink-search-launchba
 
 ## Modifier keys
 If it is not a group:
+- `⌘ + ⌥ + ↵` to create `shortcut` for that item.
 - `⌘ + ↵` to reveal that item in DEVONthink
 - `⇧ + ↵` to reveal that item in Finder
 - `⌥ + ↵` to open that item externally
 
 If it is a group:
+- `⌘ + ⌥ + ↵` to create `shortcut` for that item.
 - `⌘ + ↵` to reveal that item in DEVONthink
 - `⌥ + ↵` to navigate through that group in Launchbar
 
-Note that if you are already in "navigation mode", just press ↵ and you can navigate that group, press `⌥ + ↵` to open that group in DEVONthink.
+Note that if you are already in "navigation mode" (when you have pressed `⌥ + ↵` on a group), just press ↵ and you can continue navigate, press `⌥ + ↵` will instead open that group in DEVONthink.
 
 ## Excluded tag
 If you tag a file/group `exclude-from-launchbar`, it will not be shown in the result.
