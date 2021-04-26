@@ -6,6 +6,19 @@ The tool aims to let you search and navigate through DEVONthink effectively. It 
 Just enter the keyword and it will do a live and prefix search then nicely present the results for you.
 ![Search Result](screenshots/search-result.png)
 
+## Requirements
+This tool requires Python3 to be installed at the path `/usr/bin/python3`.
+If you are using macOS Catalina or higher version, you can run this command in terminal
+```
+xcode-select --install
+```
+to install Python3.
+
+See https://installpython3.com/mac/ for more details.
+
+If you use homebrew or other ways to install Python3, make sure it is accessible via `/usr/bin/python3`.
+
+
 ### Modifier keys
 If it is not a group:
 - `⌘ + Enter` to reveal that item in DEVONthink
