@@ -171,11 +171,18 @@ class DEVONthink:
         return json.loads(output)
 
     def _call_jsx_search(self, query, field):
-        jsonArg = json.dumps({
-            'query': query,
-            'field': field,
-            'range': [0, MAX_RESULT_NUM]
-        })
+        if MAX_RESULT_NUM is not None:
+            jsonArg = json.dumps({
+                'query': query,
+                'field': field,
+                'range': [0, MAX_RESULT_NUM]
+            })
+        else:
+            jsonArg = json.dumps({
+                'query': query,
+                'field': field,
+            })
+
         logger.debug('start search js query: {}'.format(query))
         output = subprocess.check_output(['osascript', '-l', 'JavaScript', 'search.js', jsonArg])
         logger.debug('end search js query: {}'.format(query))
