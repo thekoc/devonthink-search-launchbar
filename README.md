@@ -6,6 +6,17 @@ The tool aims to let you search and navigate through DEVONthink effectively. It 
 Just enter the keyword and it will do a live and prefix search then nicely present the results for you.
 ![Search Result](screenshots/search-result.png)
 
+## Create shortcuts for DEVONthink items!
+It is a pitty that we cannot create direct entries for DEVONthink items in LaunchBar. We have to first open this action then search then select one... What if we can create a shortcut for the item and make it accessible directly from LaunchBar without using this tool.
+
+Well, you can! Just press `⌘ + ⌥ + ↵` on that item.
+
+![Make shortcut](screenshots/make-shortcut.png)
+
+Next time that item will be searchable directly from LaunchBar by its name.
+
+![Appears in LaunchBar result](screenshots/inetloc-shortcut.png)
+
 ## Requirements
 This tool requires Python3 to be installed at the path `/usr/bin/python3`.
 If you are using macOS Catalina or higher version, you can run this command in terminal
@@ -21,15 +32,15 @@ If you use homebrew or other ways to install Python3, make sure it is accessible
 
 ### Modifier keys
 If it is not a group:
-- `⌘ + Enter` to reveal that item in DEVONthink
-- `⇧ + Enter` to reveal that item in Finder
-- `⌥ + Enter` to open that item externally
+- `⌘ + ↵` to reveal that item in DEVONthink
+- `⇧ + ↵` to reveal that item in Finder
+- `⌥ + ↵` to open that item externally
 
 If it is a group:
-- `⌘ + Enter` to reveal that item in DEVONthink
-- `⌥ + Enter` to navigate through that group in Launchbar
+- `⌘ + ↵` to reveal that item in DEVONthink
+- `⌥ + ↵` to navigate through that group in Launchbar
 
-Note that if you are already in "navigation mode", just press enter and you can navigate that group, press `⌥ + Enter` to open that group in DEVONthink.
+Note that if you are already in "navigation mode", just press ↵ and you can navigate that group, press `⌥ + ↵` to open that group in DEVONthink.
 
 ### Excluded tag
 If you tag a file/group `exclude-from-launchbar`, it will not be shown in the result.
@@ -40,19 +51,38 @@ You can adjust all those values in the config file `config.py`.
 
 ![Config](screenshots/config.png)
 
-Defualt values:
+`config.py` file:
 
 ```python
-a = 0.8
-b = 0.5
-frequency_weight = 2
-excluded_tag = 'exclude-from-launchbar'
-max_result_num = 80
+# Do not change this class
+class DefaultConfig:
+    a = 0.8
+    b = 0.5
+    frequency_weight = 2
+    excluded_tag = 'exclude-from-launchbar'
+    max_result_num = 80 # Set to None to cancel the limit. Note that this may cause performance issue!
+    shortcut_path = '~/Documents/Devonthink' # Set to None to disable shortcut creation
+
+
+# change this one
+class UserConfig(DefaultConfig):
+    a = 0.8
+    b = 0.5
+    frequency_weight = 2
+    excluded_tag = 'exclude-from-launchbar'
+    max_result_num = 80
+    shortcut_path = '~/Documents/Devonthink'
+
+
 ```
+Do not change the `DefaultConfig` class. Instead change the properties of `UserConfig`.
 
 The `max_result_num` option can be set to `None` so that all the results will be presented in LaunchBar. Note that too many results may cause performance issue!
 
 ## More details
+### The "shorcuts"
+As you may notice, the so-called shortcut is just a `inetloc` file created in your filesystem with the name and item link of the corresponding DEVONthink item. The default creation path is set to be `~/Documents/Devonthink`. You can change it to any other locations that you have write permission to. Set it to `None` will prevent the creation of any "shortcuts".
+
 ### Frequency score
 Except for the search score given by DEVONthink, the tool will adjust that score based on the frequency you open items.
 
