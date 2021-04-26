@@ -27,6 +27,8 @@ def browse_group(dt, uuid):
     print(json.dumps(items))
 
 def create_shortcut(record, is_smart_group=False):
+    if SHORTCUT_PATH is None:
+        return
     expanded = os.path.expanduser(SHORTCUT_PATH)
     os.makedirs(expanded, exist_ok=True)
     devonthink_url = dt.get_reference_url(record['uuid'], is_smart_group)
