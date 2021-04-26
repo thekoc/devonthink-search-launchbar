@@ -50,7 +50,7 @@ function searchOnce(jsonArg) {
                 filename: r.filename(),
                 path: r.path(),
                 location: r.location(),
-                referenceURL: 'x-devonthink-item://' + uuid,
+                // referenceURL: r.referenceURL(),
                 score: r.score(),
                 // thumbnail: r.thumbnail(),
                 uuid: uuid,

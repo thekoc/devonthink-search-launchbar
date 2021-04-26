@@ -8,7 +8,7 @@ function run(argv) {
             filename: r.filename(),
             path: r.path(),
             location: r.location(),
-            referenceURL: r.referenceURL(),
+            // referenceURL: r.referenceURL(),
             // score: r.score(),
             // thumbnail: r.thumbnail(),
             uuid: r.uuid(),
