@@ -17,6 +17,8 @@ Next time that item will be searchable directly from LaunchBar by its name.
 
 ![Appears in LaunchBar result](screenshots/inetloc-shortcut.png)
 
+You can later assign an [abbreviation](https://www.obdev.at/resources/launchbar/help/AbbreviationSearch.html) for it to access it faster.
+
 ## Requirements
 This tool requires Python3 to be installed at the path `/usr/bin/python3`.
 If you are using macOS Catalina or higher version, you can run this command in terminal
@@ -29,6 +31,10 @@ See https://installpython3.com/mac/ for more details.
 
 If you use homebrew or other ways to install Python3, make sure it is accessible via `/usr/bin/python3`.
 
+
+## Download
+
+It can be downloaded [here](https://github.com/thekoc/devonthink-search-launchbar/releases).
 
 ### Modifier keys
 If it is not a group:
