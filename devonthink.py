@@ -112,15 +112,21 @@ class DEVONthink:
         cmd = ['osascript', '-e', 'tell application "DEVONthink 3" to activate']
         subprocess.call(cmd)
 
-    def reveal_item(self, uuid):
+    def reveal_item(self, uuid, is_smart_group=False):
         self.activate()
-        cmd = ['/usr/bin/open', 'x-devonthink-item://{}?reveal=1'.format(uuid)]
+        cmd = ['/usr/bin/open', self.get_reference_url(uuid, is_smart_group)]
         # cmd = ['/usr/bin/osascript', 'reveal.scpt', uuid]
         subprocess.call(cmd)
 
-    def open_item(self, uuid):
-        cmd = ['/usr/bin/open', 'x-devonthink-item://{}'.format(uuid)]
+    def open_item(self, uuid, is_smart_group=False):
+        cmd = ['/usr/bin/open', self.get_reference_url(uuid, is_smart_group)]
         subprocess.call(cmd)
+    
+    def get_reference_url(self, uuid, is_smart_group=False):
+        if not is_smart_group:
+            return 'x-devonthink-item://{}'.format(uuid)
+        else:
+            return 'x-devonthink-smartgroup//{}'.format(uuid)
 
     def search_js(self, query):
         logger.debug('before jxa search.js')
