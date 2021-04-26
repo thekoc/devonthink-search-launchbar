@@ -12,11 +12,11 @@ from devonthink import DEVONthink
 from devonthink import DEVONthink
 from frequency import Frequency
 from logger import logger
-from config import shortcut_path
+from config import UserConfig
 
 
 items = []
-SHORTCUT_PATH  = shortcut_path
+SHORTCUT_PATH  = UserConfig.shortcut_path
 
 dt = DEVONthink()
 

@@ -8,10 +8,9 @@ import json
 
 from devonthink import DEVONthink
 from logger import logger
-import config
+from config import UserConfig
 
-
-EXCLUDED_TAG = config.excluded_tag
+EXCLUDED_TAG = UserConfig.excluded_tag
 QUERY_TEMPLATE = 'name:({}) tags!={}'
 items = []
 

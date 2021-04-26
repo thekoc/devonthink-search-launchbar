@@ -3,10 +3,10 @@
 import sqlite3
 import os
 from launchbar import LaunchBar
-import config
+from config import UserConfig
 
-CONSTANT_A = config.a
-CONSTANT_B = config.b
+CONSTANT_A = UserConfig.a
+CONSTANT_B = UserConfig.b
 
 class Frequency:
     def __init__(self):

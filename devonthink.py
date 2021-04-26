@@ -13,15 +13,15 @@ from launchbar import LaunchBar
 from frequency import Frequency
 from logger import logger
 from cache import Cache
-import config
+from config import UserConfig
 
 """An middle layer that handles the records returned by JXA.
 
 Using record (or r) to represent JXA returned record,
 using item to represent LaunchBar item.
 """
-CONSTANT_FREQUENCY_WEIGHT = config.frequency_weight
-MAX_RESULT_NUM = config.max_result_num
+CONSTANT_FREQUENCY_WEIGHT = UserConfig.frequency_weight
+MAX_RESULT_NUM = UserConfig.max_result_num
 
 def get_extension_name(r):
     filename = r['filename']
