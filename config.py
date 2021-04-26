@@ -7,7 +7,7 @@ class DefaultConfig:
     frequency_weight = 2
     excluded_tag = 'exclude-from-launchbar'
     max_result_num = 80 # Set to None to cancel the limit. Note that this may cause performance issue!
-    shortcut_path = '~/Documents/Devonthink' # Set to None to disable shortcut creation
+    shortcut_path = '~/Documents/DEVONthink' # Set to None to disable shortcut creation
 
 
 # change this one
@@ -17,4 +17,4 @@ class UserConfig(DefaultConfig):
     frequency_weight = 2
     excluded_tag = 'exclude-from-launchbar'
     max_result_num = 80
-    shortcut_path = '~/Documents/Devonthink'
+    shortcut_path = '~/Documents/DEVONthink'

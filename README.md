@@ -68,7 +68,7 @@ class DefaultConfig:
     frequency_weight = 2
     excluded_tag = 'exclude-from-launchbar'
     max_result_num = 80 # Set to None to cancel the limit. Note that this may cause performance issue!
-    shortcut_path = '~/Documents/Devonthink' # Set to None to disable shortcut creation
+    shortcut_path = '~/Documents/DEVONthink' # Set to None to disable shortcut creation
 
 
 # change this one
@@ -78,7 +78,7 @@ class UserConfig(DefaultConfig):
     frequency_weight = 2
     excluded_tag = 'exclude-from-launchbar'
     max_result_num = 80
-    shortcut_path = '~/Documents/Devonthink'
+    shortcut_path = '~/Documents/DEVONthink'
 
 
 ```
@@ -88,7 +88,7 @@ The `max_result_num` option can be set to `None` so that all the results will be
 
 ## More details
 ### The "shorcuts"
-As you may notice, the so-called shortcut is just a `inetloc` file created in your filesystem with the name and item link of the corresponding DEVONthink item. The default creation path is set to be `~/Documents/Devonthink`. You can change it to any other locations that you have write permission to, and make sure it is in your LaunchBar's index list. Set it to `None` will prevent the creation of any "shortcuts".
+As you may notice, the so-called shortcut is just a `inetloc` file created in your filesystem with the name and item link of the corresponding DEVONthink item. The default creation path is set to be `~/Documents/DEVONthink`. You can change it to any other locations that you have write permission to, and make sure it is in your LaunchBar's index list. Set it to `None` will prevent the creation of any "shortcuts".
 
 ### Frequency score
 Except for the search score given by DEVONthink, the tool will adjust that score based on the frequency you open items.
