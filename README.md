@@ -36,7 +36,7 @@ If you use homebrew or other ways to install Python3, make sure it is accessible
 
 It can be downloaded [here](https://github.com/thekoc/devonthink-search-launchbar/releases).
 
-### Modifier keys
+## Modifier keys
 If it is not a group:
 - `⌘ + ↵` to reveal that item in DEVONthink
 - `⇧ + ↵` to reveal that item in Finder
@@ -48,9 +48,8 @@ If it is a group:
 
 Note that if you are already in "navigation mode", just press ↵ and you can navigate that group, press `⌥ + ↵` to open that group in DEVONthink.
 
-### Excluded tag
+## Excluded tag
 If you tag a file/group `exclude-from-launchbar`, it will not be shown in the result.
-
 
 ## Config
 You can adjust all those values in the config file `config.py`.
