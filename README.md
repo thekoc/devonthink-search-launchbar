@@ -19,6 +19,8 @@ Next time that item will be searchable directly from LaunchBar by its name.
 
 You can later assign an [abbreviation](https://www.obdev.at/resources/launchbar/help/AbbreviationSearch.html) for it to access it faster.
 
+Make sure `~/Documents/` is in the index of you LaunchBar otherwise it would not work. See [here](https://github.com/thekoc/devonthink-search-launchbar#the-shorcuts) for more details.
+
 ## Requirements
 This tool requires Python3 to be installed at the path `/usr/bin/python3`.
 If you are using macOS Catalina or higher version, you can run this command in terminal
@@ -86,7 +88,7 @@ The `max_result_num` option can be set to `None` so that all the results will be
 
 ## More details
 ### The "shorcuts"
-As you may notice, the so-called shortcut is just a `inetloc` file created in your filesystem with the name and item link of the corresponding DEVONthink item. The default creation path is set to be `~/Documents/Devonthink`. You can change it to any other locations that you have write permission to. Set it to `None` will prevent the creation of any "shortcuts".
+As you may notice, the so-called shortcut is just a `inetloc` file created in your filesystem with the name and item link of the corresponding DEVONthink item. The default creation path is set to be `~/Documents/Devonthink`. You can change it to any other locations that you have write permission to, and make sure it is in your LaunchBar's index list. Set it to `None` will prevent the creation of any "shortcuts".
 
 ### Frequency score
 Except for the search score given by DEVONthink, the tool will adjust that score based on the frequency you open items.
