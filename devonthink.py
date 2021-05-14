@@ -68,6 +68,7 @@ def to_lb_item(record, candidate_uuids, returnKeyToBrowseGroup=True):
     record = {key: record.get(key) for key in keys}
     potential_icon = get_icon(record)
     actionArgument = json.dumps({
+        'path': record['path'],
         'pickedRecord': record,
         'pickedUuid': record['uuid'],
         'candidateUuids': candidate_uuids,
@@ -114,8 +115,7 @@ class DEVONthink:
 
     def reveal_item(self, uuid, is_smart_group=False):
         self.activate()
-        cmd = ['/usr/bin/open', self.get_reference_url(uuid, is_smart_group)]
-        # cmd = ['/usr/bin/osascript', 'reveal.scpt', uuid]
+        cmd = ['/usr/bin/open', self.get_reference_url(uuid, is_smart_group) + '?reveal=1']
         subprocess.call(cmd)
 
     def open_item(self, uuid, is_smart_group=False):
