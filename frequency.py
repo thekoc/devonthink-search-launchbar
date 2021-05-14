@@ -8,9 +8,11 @@ from config import UserConfig
 CONSTANT_A = UserConfig.a
 CONSTANT_B = UserConfig.b
 
+DB_PATH = os.path.join(LaunchBar.support_path(), 'frequency.db')
+
 class Frequency:
     def __init__(self):
-        self.sql_path = os.path.join(LaunchBar.support_path(), 'frequency.db')
+        self.sql_path = DB_PATH
         self.connection = sqlite3.connect(self.sql_path)
         cursor = self.connection.cursor()
         cursor.execute("create table if not exists frequency (uuid text primary key, score integer default 0)")
