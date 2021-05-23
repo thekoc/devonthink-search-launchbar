@@ -38,7 +38,8 @@ def parse_query(arg):
             clean_all_db()
         else:
             raise LaunchBarError(dict(title='Invalid arguments',icon='character:🚫'))
-
+    elif arg.startswith('`'):
+        return arg[1:]
     elif len(arg.split()) == 1:
         return QUERY_TEMPLATE.format(prepend_tilde(arg), EXCLUDED_TAG)
     else:
@@ -75,8 +76,10 @@ def main():
             items.append(lb_item)
         else:
             raise ValueError()
+    else:
+        logger.debug(f'Record amounts: {len(items)}')
+
         
-    logger.debug(f'Record amounts: {len(items)}')
     print(json.dumps(items))
 
 
