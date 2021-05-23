@@ -67,6 +67,22 @@ def action(record, uuid, candidate_uuids, return_key_to_browse):
             else:
                 LaunchBar.hide()
                 dt.open_item(uuid)
+    elif record_type == 'bookmark':
+        if LaunchBar.is_command_key() and LaunchBar.is_alternate_key():
+            create_shortcut(record, is_smart_group)
+            LaunchBar.hide()
+            dt.open_item(uuid)
+        elif LaunchBar.is_command_key():
+            LaunchBar.hide()
+            dt.reveal_item(uuid)
+        elif LaunchBar.is_alternate_key():
+            LaunchBar.hide()
+            dt.open_item(uuid)
+        elif LaunchBar.is_shift_key():
+            subprocess.call(['open', os.path.dirname(record['path'])])
+        else:
+            subprocess.call(['open', record['path']])
+
     else:
         if LaunchBar.is_command_key() and LaunchBar.is_alternate_key():
             create_shortcut(record, is_smart_group)
